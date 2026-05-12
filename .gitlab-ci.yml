@@ -1,0 +1,43 @@
+image: maven:3.9.9-eclipse-temurin-21
+
+variables:
+  MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
+
+stages:
+  - build
+  - test
+
+cache:
+  key: "$CI_COMMIT_REF_SLUG"
+  paths:
+    - .m2/repository
+
+build_project:
+  stage: build
+  script:
+    - mvn -B -DskipTests clean package
+  artifacts:
+    when: on_success
+    expire_in: 7 days
+    paths:
+      - target/*.jar
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+
+test_project:
+  stage: test
+  script:
+    - mvn -B verify
+    - ls -R target || true
+  artifacts:
+    when: always
+    expire_in: 7 days
+    reports:
+      junit: target/surefire-reports/*.xml
+    paths:
+      - target/surefire-reports/
+      - target/site/jacoco/
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
