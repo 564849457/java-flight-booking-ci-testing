@@ -25,9 +25,6 @@ build_project:
     expire_in: 7 days
     paths:
       - target/*.jar
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
 
 test_project:
   stage: test
@@ -40,6 +37,3 @@ test_project:
       junit: target/surefire-reports/*.xml
     paths:
       - target/surefire-reports/
-  rules:
-    - if: '$CI_PIPELINE_SOURCE == "push"'
-    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
