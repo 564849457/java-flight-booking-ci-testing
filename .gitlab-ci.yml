@@ -1,4 +1,8 @@
-image: maven:3.9.9-eclipse-temurin-21
+image: maven:3.9-eclipse-temurin-21
+
+default:
+  tags:
+    - sonarqube
 
 variables:
   MAVEN_OPTS: "-Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository"
@@ -28,8 +32,7 @@ build_project:
 test_project:
   stage: test
   script:
-    - mvn -B verify
-    - ls -R target || true
+    - mvn -B test
   artifacts:
     when: always
     expire_in: 7 days
@@ -37,7 +40,6 @@ test_project:
       junit: target/surefire-reports/*.xml
     paths:
       - target/surefire-reports/
-      - target/site/jacoco/
   rules:
     - if: '$CI_PIPELINE_SOURCE == "push"'
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
